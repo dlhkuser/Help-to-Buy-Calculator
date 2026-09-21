@@ -1,0 +1,1175 @@
+<title>Help to Buy Calculator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#F6F8F9; --surface:#FFFFFF; --surface-2:#EDF1F3; --surface-3:#E3E9EC;
+  --border:#D5DDE2; --border-strong:#B9C5CC;
+  --text:#14202A; --dim:#5A6B78; --faint:#8496A2;
+  --accent:#0F5F6E; --accent-soft:#DDEDF0;
+  --gov:#AB5E33; --gov-soft:#F7E8DF;
+  --good:#2C7A58; --warn:#8F6310; --warn-soft:#FAF0D9; --danger:#9E3030; --danger-soft:#F9E4E4;
+  --shadow:0 1px 2px rgba(20,32,42,.06),0 4px 14px rgba(20,32,42,.05);
+  --cal:0;
+  --cjk:'PingFang TC','Microsoft JhengHei','Noto Sans TC','Noto Sans CJK TC','Heiti TC';
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:'Public Sans',system-ui,-apple-system,'Segoe UI',var(--cjk),sans-serif;
+  --serif:'Newsreader',Georgia,'Times New Roman','Songti TC',var(--cjk),serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E151B; --surface:#161F27; --surface-2:#1C2831; --surface-3:#24323D;
+  --border:#2A3945; --border-strong:#3A4C5A;
+  --text:#E4ECF1; --dim:#93A5B2; --faint:#6E8290;
+  --accent:#4FB0C2; --accent-soft:#11373F;
+  --gov:#D98A5A; --gov-soft:#38231A;
+  --good:#5BBF90; --warn:#D3A542; --warn-soft:#332B14; --danger:#E07373; --danger-soft:#381E1E;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.3);
+  --cal:1;
+}}
+:root[data-theme="dark"]{
+  --bg:#0E151B; --surface:#161F27; --surface-2:#1C2831; --surface-3:#24323D;
+  --border:#2A3945; --border-strong:#3A4C5A;
+  --text:#E4ECF1; --dim:#93A5B2; --faint:#6E8290;
+  --accent:#4FB0C2; --accent-soft:#11373F;
+  --gov:#D98A5A; --gov-soft:#38231A;
+  --good:#5BBF90; --warn:#D3A542; --warn-soft:#332B14; --danger:#E07373; --danger-soft:#381E1E;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.3);
+  --cal:1;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.5;margin:0}
+:root[lang="zh-Hant"] body{line-height:1.65}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:32px 72px}
+h1,h2{font-family:var(--serif);font-weight:500;text-wrap:balance;margin:0}
+h1{font-size:clamp(28px,4.4vw,40px);letter-spacing:-.015em;line-height:1.12}
+h2{font-size:20px;letter-spacing:-.01em}
+.sub{color:var(--dim);max-width:62ch;margin-top:10px;font-size:14.5px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+:root[lang="zh-Hant"] .eyebrow{letter-spacing:.06em}
+header{border-bottom:1px solid var(--border);padding-bottom:22px;margin-bottom:28px}
+.hrow{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap}
+.langseg{flex:0 0 auto;min-width:190px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.layout{display:grid;grid-template-columns:330px minmax(0,1fr);gap:26px;align-items:start}
+/* grid/flex children default to min-width:auto, which lets wide content blow the track out */
+.layout>*{min-width:0}
+@media(max-width:900px){.layout{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow)}
+.panel-pad{padding:18px}
+.inputs{position:sticky;top:env(safe-area-inset-top,0px)}
+@media(max-width:900px){.inputs{position:static}}
+fieldset{border:0;margin:0;padding:0}
+.grp{border-top:1px solid var(--border);padding-block:14px}
+.grp:first-of-type{border-top:0;padding-top:0}
+.grp-title{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin-bottom:11px}
+:root[lang="zh-Hant"] .grp-title{letter-spacing:.05em}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.field:last-child{margin-bottom:0}
+label{font-size:13px;font-weight:500;color:var(--dim);display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.hint{font-size:11.5px;color:var(--faint);font-weight:400;text-align:right}
+.inp{position:relative;display:flex;align-items:center}
+.inp .pre,.inp .post{position:absolute;color:var(--faint);font-size:13px;font-family:var(--mono);pointer-events:none}
+.inp .pre{left:10px}.inp .post{right:10px}
+input[type=number],input[type=date],select{width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:14px;padding:9px 10px;appearance:none}
+input[type=date]{cursor:pointer}
+input[type=date]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.55;filter:invert(var(--cal))}
+input[type=number].has-pre{padding-left:22px}
+input[type=number].has-post{padding-right:46px}
+select{font-family:var(--sans);cursor:pointer;background-image:linear-gradient(45deg,transparent 50%,var(--faint) 50%),linear-gradient(135deg,var(--faint) 50%,transparent 50%);background-position:calc(100% - 15px) 50%,calc(100% - 10px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:30px}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+input[type=number]::-webkit-inner-spin-button{opacity:.35}
+.chk{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--dim);cursor:pointer;margin-top:2px;text-align:left}
+.chk input{accent-color:var(--accent);width:15px;height:15px;cursor:pointer;flex:0 0 auto}
+.subhint{font-size:11.5px;color:var(--faint);line-height:1.45}
+.saverow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.savestate{font-size:11.5px;color:var(--faint);display:flex;align-items:center;gap:5px;min-height:16px}
+.savestate.on{color:var(--good)}
+.savestate i{width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block;flex:0 0 auto}
+button.ghost{background:var(--surface-2);border:1px solid var(--border);border-radius:6px;color:var(--dim);
+  font-family:var(--sans);font-size:12px;font-weight:600;padding:6px 11px;cursor:pointer}
+button.ghost:hover{border-color:var(--border-strong);color:var(--text)}
+.seg{display:flex;background:var(--surface-2);border:1px solid var(--border);border-radius:7px;padding:2px;gap:2px}
+.seg button{flex:1;background:transparent;border:0;border-radius:5px;color:var(--dim);font-family:var(--sans);font-size:12.5px;font-weight:600;padding:7px 4px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--surface);color:var(--accent);box-shadow:0 1px 2px rgba(0,0,0,.09)}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:620px){.cards{grid-template-columns:1fr}}
+.card{border-radius:10px;border:1px solid var(--border);background:var(--surface);box-shadow:var(--shadow);overflow:hidden}
+.card.lead{border-color:var(--accent);border-width:1.5px}
+.card-top{padding:13px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:10px}
+.card.lead .card-top{background:var(--accent-soft)}
+.card-name{font-family:var(--serif);font-size:16.5px}
+.tag{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:3px 7px;border-radius:4px;background:var(--surface-3);color:var(--dim);white-space:nowrap}
+.card.lead .tag{background:var(--accent);color:#fff}
+.card-body{padding:16px}
+.big{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:29px;font-weight:600;letter-spacing:-.02em;line-height:1.05}
+.big small{font-size:13px;font-weight:400;color:var(--dim);font-family:var(--sans);letter-spacing:0}
+.rows{margin-top:14px;border-top:1px solid var(--border)}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13.5px}
+.row:last-child{border-bottom:0}
+.row .k{color:var(--dim)}
+.row .v{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:500;text-align:right}
+.v.gov{color:var(--gov)}
+.v.good{color:var(--good)}
+tbody tr.free td{color:var(--good)}
+.delta{margin-top:16px;padding:12px 14px;border-radius:8px;background:var(--accent-soft);border:1px solid var(--accent);font-size:13.5px;line-height:1.45}
+.delta b{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.note{border-radius:8px;padding:12px 14px;font-size:13px;line-height:1.5;border:1px solid}
+.note.warn{background:var(--warn-soft);border-color:var(--warn);color:var(--text)}
+.note.ok{background:var(--accent-soft);border-color:var(--accent);color:var(--text)}
+.note.bad{background:var(--danger-soft);border-color:var(--danger);color:var(--text)}
+.note+.note{margin-top:9px}
+section{margin-top:30px}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-bottom:13px}
+.sec-head p{margin:4px 0 0;color:var(--dim);font-size:13.5px;max-width:60ch}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+thead th{position:sticky;top:0;background:var(--surface-2);text-align:right;font-weight:600;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--dim);padding:9px 10px;border-bottom:1px solid var(--border-strong);white-space:nowrap;z-index:1}
+thead th:first-child,thead th:nth-child(2){text-align:left}
+tbody td{text-align:right;padding:6px 10px;border-bottom:1px solid var(--border);font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+tbody td:first-child,tbody td:nth-child(2){text-align:left;color:var(--dim)}
+tbody tr.yr{background:var(--surface-2)}
+tbody tr.yr td{font-weight:600;color:var(--text)}
+tbody tr.yr td:first-child{color:var(--accent)}
+/* a year whose interest came to nothing is interest-free too — needs to beat .yr above */
+tbody tr.yr.free td,tbody tr.yr.free td:first-child{color:var(--good)}
+.scroller{max-height:520px;overflow:auto;border-radius:10px;border:1px solid var(--border);background:var(--surface)}
+.tablenote{margin-top:11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;font-size:12.5px;line-height:1.55;color:var(--dim);max-width:78ch}
+.tablenote .key{display:inline-flex;align-items:center;gap:6px;flex:0 0 auto}
+.tablenote .key b{color:var(--good);font-weight:600}
+.tablenote .dot{width:10px;height:10px;border-radius:3px;display:inline-block;flex:0 0 auto}
+.tablenote .dot.free{background:var(--good)}
+.chartbox{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;box-shadow:var(--shadow)}
+svg{display:block;width:100%;height:auto;max-width:100%}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:12.5px;color:var(--dim)}
+.legend span{display:flex;align-items:center;gap:6px}
+.sw{width:20px;height:3px;display:inline-block;flex:0 0 auto}
+.sw.a{color:var(--accent)}
+.sw.c{color:var(--gov)}
+.sw.solid{background:currentColor;border-radius:2px}
+/* matches the chart's stroke-dasharray="4 3" */
+.sw.dash{background-image:repeating-linear-gradient(to right,currentColor 0 5px,transparent 5px 9px);opacity:.7}
+.foot{margin-top:38px;padding-top:20px;border-top:1px solid var(--border);color:var(--faint);font-size:12.5px;line-height:1.6}
+.foot a{color:var(--accent)}
+.foot p{margin:0 0 8px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:13px 14px}
+.tile .tk{font-size:11.5px;color:var(--dim)}
+.tile .tv{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:19px;font-weight:600;margin-top:5px;letter-spacing:-.01em}
+.tile.em{border-color:var(--gov);background:var(--gov-soft)}
+.tile.em .tv{color:var(--gov)}
+.segwide{max-width:320px}
+.bbnote{margin:12px 0 0;font-size:12.5px;line-height:1.6;color:var(--faint);max-width:78ch}
+
+/* ---------- mobile section nav ---------- */
+.mnav{display:flex;position:sticky;top:env(safe-area-inset-top,0px);z-index:60;background:var(--bg);
+  border-bottom:1px solid var(--border);align-items:center;gap:12px;
+  padding-block:10px;margin-bottom:18px}
+.mnav[hidden]{display:none}
+.mnav-btn{width:40px;height:40px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+  background:var(--surface-2);border:1px solid var(--border);border-radius:8px;cursor:pointer;padding:0}
+.mnav-btn .bars{display:flex;flex-direction:column;gap:4px;width:17px}
+.mnav-btn .bars i{display:block;height:2px;background:var(--text);border-radius:1px;transform-origin:center}
+@media (prefers-reduced-motion:no-preference){.mnav-btn .bars i{transition:transform .18s,opacity .18s}}
+.mnav-btn[aria-expanded="true"] .bars i:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.mnav-btn[aria-expanded="true"] .bars i:nth-child(2){opacity:0}
+.mnav-btn[aria-expanded="true"] .bars i:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+.mnav-title{font-family:var(--serif);font-size:17px;line-height:1.2;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.navmenu{position:absolute;top:100%;left:0;right:0;margin-top:9px;z-index:61;
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  box-shadow:0 10px 30px rgba(0,0,0,.28);padding:6px;flex-direction:column;gap:2px;display:flex}
+.navmenu[hidden]{display:none}
+.navmenu button{text-align:left;background:transparent;border:0;border-radius:7px;
+  color:var(--dim);font-family:var(--sans);font-size:14.5px;font-weight:500;
+  padding:11px 12px;cursor:pointer}
+.navmenu button.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.langseg.inmenu{margin-top:8px;min-width:0}
+.langseg.inmenu button{text-align:center;padding:9px 4px}
+.navscrim{position:fixed;inset:0;z-index:55;background:rgba(0,0,0,.35)}
+.navscrim[hidden]{display:none}
+/* fixed to the viewport bottom so it is reachable from anywhere in a section */
+.pager{display:flex;gap:10px;position:fixed;left:0;right:0;bottom:0;z-index:50;
+  background:var(--bg);border-top:1px solid var(--border);
+  box-shadow:0 -6px 18px rgba(0,0,0,.18);
+  padding:10px 20px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px))}
+@media(max-width:560px){.pager{padding-inline:16px}}
+.pager[hidden]{display:none}
+.pagerbtn{flex:1 1 0;min-width:0;background:var(--surface-2);border:1px solid var(--border);
+  border-radius:9px;color:var(--text);font-family:var(--sans);padding:11px 13px;cursor:pointer;
+  display:flex;flex-direction:column;gap:3px}
+.pagerbtn .pl{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--faint);white-space:nowrap}
+:root[lang="zh-Hant"] .pagerbtn .pl{letter-spacing:.03em}
+.pagerbtn .pn{font-size:13.5px;font-weight:600;line-height:1.25;max-width:100%;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#prevBtn{align-items:flex-start;text-align:left}
+#nextBtn{align-items:flex-end;text-align:right}
+.pagerbtn:not(:disabled):hover{border-color:var(--border-strong)}
+.pagerbtn:disabled{opacity:.32;cursor:default}
+.flush{margin-top:0}
+
+/* ---------- collapsible input panel (mobile only) ---------- */
+.panel-toggle{display:none;width:100%;align-items:center;justify-content:space-between;gap:10px;
+  background:transparent;border:0;padding:0 0 13px;margin-bottom:14px;color:var(--text);
+  font-family:var(--serif);font-size:17px;cursor:pointer;border-bottom:1px solid var(--border)}
+.panel-toggle .chev{width:9px;height:9px;border-right:2px solid var(--dim);border-bottom:2px solid var(--dim);
+  transform:rotate(45deg) translate(-2px,-2px);flex:0 0 auto}
+.panel-toggle[aria-expanded="false"] .chev{transform:rotate(-135deg) translate(-2px,-2px)}
+@media (prefers-reduced-motion:no-preference){.panel-toggle .chev{transition:transform .18s ease}}
+
+/* ---------- tablet and below ---------- */
+@media(max-width:900px){
+  .wrap{padding-block:22px 56px}
+  .segwide{max-width:none}
+  .sec-head{align-items:stretch}
+  .sec-head .segwide{width:100%}
+}
+
+/* ---------- phone ---------- */
+@media(max-width:560px){
+  body{font-size:14.5px}
+  .wrap{padding-inline:16px}
+  h1{font-size:25px}
+  .sub{font-size:14px}
+  .langseg{min-width:0;width:100%}
+  /* 16px prevents iOS zooming the page on focus */
+  input[type=number],input[type=date],select{padding:12px 10px;font-size:16px}
+  input[type=number].has-pre{padding-left:24px}
+  .big{font-size:25px}
+  .card-body,.panel-pad{padding:14px}
+  .tiles{grid-template-columns:1fr 1fr}
+  .tile .tv{font-size:17px}
+  .legend{gap:9px 14px;font-size:12px}
+  .scroller{max-height:min(520px,58vh)}
+  thead th{padding:8px;font-size:10px;letter-spacing:.02em}
+  tbody td{padding:7px 8px;font-size:11.5px}
+  /* keep the period column anchored while scrolling sideways */
+  thead th:first-child,tbody td:first-child{position:sticky;left:0}
+  tbody td:first-child{background:var(--surface);z-index:2;
+    box-shadow:1px 0 0 var(--border)}
+  tbody tr.yr td:first-child{background:var(--surface-2)}
+  thead th:first-child{z-index:4;box-shadow:1px 0 0 var(--border-strong)}
+}
+</style>
+
+<div class="wrap">
+<header data-view="v-intro">
+  <div class="hrow" id="hrow">
+    <div>
+      <div class="eyebrow" data-i18n="eyebrow">Western Australia &middot; Shared equity</div>
+      <h1 data-i18n="h1">Help to Buy Calculator</h1>
+    </div>
+    <div class="seg langseg" id="langSeg">
+      <button type="button" data-l="en" aria-pressed="true">English</button>
+      <button type="button" data-l="zh" aria-pressed="false">繁體中文</button>
+    </div>
+  </div>
+  <p class="sub" data-i18n="sub"></p>
+</header>
+
+<div class="mnav" id="mnav" hidden>
+  <button type="button" class="mnav-btn" id="navBtn" aria-expanded="false" aria-controls="navMenu">
+    <span class="bars"><i></i><i></i><i></i></span>
+  </button>
+  <div class="mnav-title" id="navTitle"></div>
+  <nav class="navmenu" id="navMenu" hidden>
+    <button type="button" data-go="v-intro" data-i18n="nav_intro"></button>
+    <button type="button" data-go="v-inputs" data-i18n="nav_inputs"></button>
+    <button type="button" data-go="v-summary" data-i18n="nav_summary"></button>
+    <button type="button" data-go="v-cash" data-i18n="nav_cash"></button>
+    <button type="button" data-go="v-gov" data-i18n="nav_gov"></button>
+    <button type="button" data-go="v-buyback" data-i18n="nav_buyback"></button>
+    <button type="button" data-go="v-breakeven" data-i18n="nav_breakeven"></button>
+    <button type="button" data-go="v-chart" data-i18n="nav_chart"></button>
+    <button type="button" data-go="v-schedule" data-i18n="nav_schedule"></button>
+    <button type="button" data-go="v-notes" data-i18n="nav_notes"></button>
+  </nav>
+</div>
+<div class="navscrim" id="navScrim" hidden></div>
+
+<div class="layout">
+  <form class="panel panel-pad inputs" id="f" data-view="v-inputs" autocomplete="off">
+    <button type="button" class="panel-toggle" id="inputsToggle" aria-expanded="true" aria-controls="inputsBody">
+      <span data-i18n="inputs_title"></span><span class="chev"></span>
+    </button>
+    <div id="inputsBody">
+    <fieldset class="grp">
+      <div class="grp-title" data-i18n="g_property"></div>
+      <div class="field">
+        <label for="price"><span data-i18n="l_price"></span> <span class="hint" data-i18n="h_price"></span></label>
+        <div class="inp"><span class="pre">$</span><input class="has-pre" type="number" id="price" value="850000" min="50000" step="5000"></div>
+      </div>
+      <div class="field">
+        <label for="homeType"><span data-i18n="l_homeType"></span></label>
+        <select id="homeType">
+          <option value="existing" data-i18n="o_existing" selected></option>
+          <option value="new" data-i18n="o_new"></option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="govpct"><span data-i18n="l_govpct"></span></label>
+        <div class="inp"><input class="has-post" type="number" id="govpct" value="30" min="0" max="40" step="0.5"><span class="post">%</span></div>
+      </div>
+    </fieldset>
+
+    <fieldset class="grp">
+      <div class="grp-title" data-i18n="g_cash"></div>
+      <div class="field">
+        <label for="deposit"><span data-i18n="l_deposit"></span> <span class="hint" id="depPct">2.0%</span></label>
+        <div class="inp"><span class="pre">$</span><input class="has-pre" type="number" id="deposit" value="17000" min="0" step="1000"></div>
+      </div>
+      <div class="field">
+        <label for="duty"><span data-i18n="l_duty"></span> <span class="hint" id="dutyAuto"></span></label>
+        <div class="inp"><span class="pre">$</span><input class="has-pre" type="number" id="duty" value="34891" min="0" step="100"></div>
+        <label class="chk"><input type="checkbox" id="dutyLock" checked> <span data-i18n="c_dutyLock"></span></label>
+      </div>
+      <div class="field">
+        <label for="costs"><span data-i18n="l_costs"></span> <span class="hint" data-i18n="h_costs"></span></label>
+        <div class="inp"><span class="pre">$</span><input class="has-pre" type="number" id="costs" value="4000" min="0" step="250"></div>
+      </div>
+    </fieldset>
+
+    <fieldset class="grp">
+      <div class="grp-title" data-i18n="g_loan"></div>
+      <div class="field">
+        <label for="rate"><span data-i18n="l_rate"></span></label>
+        <div class="inp"><input class="has-post" type="number" id="rate" value="6" min="0.1" max="20" step="0.05"><span class="post">% p.a.</span></div>
+      </div>
+      <div class="field">
+        <label for="term"><span data-i18n="l_term"></span></label>
+        <div class="inp"><input class="has-post" type="number" id="term" value="30" min="1" max="40" step="1"><span class="post" data-i18n="u_years"></span></div>
+      </div>
+      <div class="field">
+        <label for="freq"><span data-i18n="l_freq"></span></label>
+        <select id="freq">
+          <option value="12" data-i18n="o_monthly"></option>
+          <option value="26" data-i18n="o_fortnightly" selected></option>
+          <option value="52" data-i18n="o_weekly"></option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="start"><span data-i18n="l_start"></span> <span class="hint" data-i18n="h_start"></span></label>
+        <input type="date" id="start" value="2026-10-01">
+      </div>
+    </fieldset>
+
+    <fieldset class="grp">
+      <div class="grp-title" data-i18n="g_offset"></div>
+      <div class="field">
+        <label for="offset"><span data-i18n="l_offset"></span></label>
+        <div class="inp"><span class="pre">$</span><input class="has-pre" type="number" id="offset" value="10000" min="0" step="1000"></div>
+      </div>
+      <div class="field">
+        <label for="extra"><span data-i18n="l_extra"></span> <span class="hint" data-i18n="h_extra"></span></label>
+        <div class="inp"><span class="pre">$</span><input class="has-pre" type="number" id="extra" value="200" min="0" step="25"></div>
+        <label class="chk"><input type="checkbox" id="dischargeChk"> <span data-i18n="c_discharge"></span></label>
+        <div class="subhint" id="dischargeHint"></div>
+      </div>
+    </fieldset>
+
+    <fieldset class="grp">
+      <div class="grp-title" data-i18n="g_growth"></div>
+      <div class="field">
+        <label for="growth"><span data-i18n="l_growth"></span> <span class="hint" data-i18n="h_growth"></span></label>
+        <div class="inp"><input class="has-post" type="number" id="growth" value="3" min="-5" max="15" step="0.25"><span class="post">% p.a.</span></div>
+      </div>
+      <div class="field">
+        <label for="exit"><span data-i18n="l_exit"></span></label>
+        <div class="inp"><input class="has-post" type="number" id="exit" value="10" min="1" max="40" step="1"><span class="post" data-i18n="u_yrs"></span></div>
+      </div>
+    </fieldset>
+
+    <div class="grp saverow">
+      <span class="savestate" id="saveState"></span>
+      <button type="button" class="ghost" id="resetBtn" data-i18n="btn_reset"></button>
+    </div>
+    </div>
+  </form>
+
+  <div>
+    <section data-view="v-summary" class="flush">
+      <div id="alerts"></div>
+      <div class="cards" id="cards"></div>
+      <div class="delta" id="delta"></div>
+    </section>
+
+    <section data-view="v-cash">
+      <div class="sec-head"><div>
+        <h2 data-i18n="s_cash_h"></h2>
+        <p data-i18n="s_cash_p"></p>
+      </div></div>
+      <div class="tiles" id="cashTiles"></div>
+    </section>
+
+    <section data-view="v-gov">
+      <div class="sec-head"><div>
+        <h2 data-i18n="s_gov_h"></h2>
+        <p data-i18n="s_gov_p"></p>
+      </div></div>
+      <div class="tiles" id="govTiles"></div>
+    </section>
+
+    <section data-view="v-buyback">
+      <div class="sec-head"><div>
+        <h2 data-i18n="s_bb_h"></h2>
+        <p data-i18n="s_bb_p"></p>
+      </div></div>
+      <div class="note ok" id="bbVerdict"></div>
+      <div class="tiles" id="bbTiles" style="margin-top:12px"></div>
+      <p class="bbnote" data-i18n="s_bb_caveat"></p>
+    </section>
+
+    <section data-view="v-breakeven">
+      <div class="sec-head"><div>
+        <h2 data-i18n="s_be_h"></h2>
+        <p data-i18n="s_be_p"></p>
+      </div></div>
+      <div class="note ok" id="beVerdict"></div>
+      <div class="tiles" id="beTiles" style="margin-top:12px"></div>
+      <p class="bbnote" id="beProfit"></p>
+    </section>
+
+    <section data-view="v-chart">
+      <div class="sec-head"><div>
+        <h2 data-i18n="s_chart_h"></h2>
+        <p data-i18n="s_chart_p"></p>
+      </div></div>
+      <div class="chartbox">
+        <div id="chart"></div>
+        <div class="legend">
+          <span><i class="sw solid a"></i> <span data-i18n="leg_a"></span></span>
+          <span><i class="sw dash a"></i> <span data-i18n="leg_b"></span></span>
+          <span><i class="sw solid c"></i> <span data-i18n="leg_c"></span></span>
+          <span><i class="sw dash c"></i> <span data-i18n="leg_d"></span></span>
+        </div>
+      </div>
+    </section>
+
+    <section data-view="v-schedule">
+      <div class="sec-head">
+        <div><h2 data-i18n="s_sched_h"></h2><p data-i18n="s_sched_p"></p></div>
+        <div class="seg segwide" id="schemeSeg">
+          <button type="button" data-s="htb" data-i18n="btn_htb" aria-pressed="true"></button>
+          <button type="button" data-s="std" data-i18n="btn_std" aria-pressed="false"></button>
+        </div>
+      </div>
+      <div class="seg segwide" id="viewSeg" style="margin-bottom:12px">
+        <button type="button" data-v="year" data-i18n="btn_year" aria-pressed="true"></button>
+        <button type="button" data-v="period" data-i18n="btn_period" aria-pressed="false"></button>
+      </div>
+      <div class="scroller">
+        <table>
+          <thead><tr>
+            <th data-i18n="th_period"></th><th data-i18n="th_date"></th><th data-i18n="th_repay"></th>
+            <th data-i18n="th_int"></th><th data-i18n="th_prin"></th>
+            <th data-i18n="th_ci"></th><th data-i18n="th_cp"></th>
+            <th data-i18n="th_off"></th><th data-i18n="th_bal"></th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="tablenote">
+        <span class="key"><i class="dot free"></i><b data-i18n="key_free"></b></span>
+        <span data-i18n="tbl_note"></span>
+      </div>
+    </section>
+
+    <div class="foot" data-view="v-notes">
+      <p data-i18n-html="foot1"></p>
+      <p data-i18n-html="foot2"></p>
+    </div>
+  </div>
+</div>
+
+<div class="pager" id="pager" hidden>
+  <button type="button" class="pagerbtn" id="prevBtn"></button>
+  <button type="button" class="pagerbtn" id="nextBtn"></button>
+</div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  function $(id){return document.getElementById(id)}
+
+  var STR={
+    en:{
+      eyebrow:'Western Australia · Shared equity',
+      h1:'Help to Buy Calculator',
+      sub:'Model an Australian Government Help to Buy purchase against an ordinary loan on the same property — repayments, offset, and what the Government’s equity share actually costs you. Defaults are set for an $850,000 Perth purchase.',
+      g_property:'The property', g_cash:'Your cash', g_loan:'The loan', g_offset:'Offset', g_growth:'Capital growth',
+      l_price:'Property value', h_price:'WA metro cap $850,000',
+      l_homeType:'Home type', o_existing:'Existing home — up to 30%', o_new:'Newly built home — up to 40%',
+      l_govpct:'Government contribution',
+      l_deposit:'Deposit',
+      l_duty:'Stamp duty', c_dutyLock:'Auto-calculate from WA rates',
+      duty_none:'auto · no concession', duty_exempt:'auto · exempt', duty_conc:'auto · concessional', duty_manual:'manual',
+      l_costs:'Other upfront costs', h_costs:'legals, searches',
+      l_rate:'Interest rate', l_term:'Loan term', u_years:'years',
+      l_freq:'Repayment period', o_monthly:'Monthly', o_fortnightly:'Fortnightly', o_weekly:'Weekly',
+      l_start:'Settlement date', h_start:'first repayment follows',
+      l_offset:'Offset starting balance', l_extra:'Extra into offset', h_extra:'each period',
+      c_discharge:'Discharge the loan once the offset covers it',
+      dis_on:'On: the loan closes the moment the offset covers it, using offset funds.',
+      dis_off:'Off: keep repaying, remaining balance carried interest-free. Contributions stop once the offset covers the debt.',
+      l_growth:'Assumed growth', h_growth:'prices the Govt share', l_exit:'Buy out or sell at year', u_yrs:'yrs',
+      s_cash_h:'Cash you need at settlement',
+      s_cash_p:'Deposit and costs are paid from savings. The offset balance is separate money you keep access to.',
+      s_gov_h:'What the Government’s share costs',
+      s_gov_p:'You pay no interest on the contribution. Instead the Government keeps its percentage of the property’s value whenever you buy it out or sell.',
+      s_chart_h:'Loan balance over time',
+      s_chart_p:'Solid lines are the amount owing. Dashed lines are the balance net of your growing offset — where that hits zero, interest stops.',
+      leg_a:'Help to Buy — owing', leg_b:'Help to Buy — net of offset',
+      leg_c:'Ordinary loan — owing', leg_d:'Ordinary loan — net of offset',
+      s_sched_h:'Repayment schedule',
+      s_sched_p:'Every repayment period, with running totals for interest and principal.',
+      btn_htb:'Help to Buy', btn_std:'Ordinary loan', btn_year:'Yearly totals', btn_period:'Every period',
+      th_period:'Period', th_date:'Date', th_repay:'Repayment', th_int:'Interest', th_prin:'Principal',
+      th_ci:'Interest to date', th_cp:'Principal to date', th_off:'Offset', th_bal:'Balance owing',
+      c_htb:'Help to Buy', c_htb_tag:'Shared equity', c_std:'Ordinary loan', c_std_tag:'5% Deposit Scheme',
+      r_loan:'Loan amount', r_gov:'Government equity', r_dep:'Your deposit', r_lvr:'Loan to value',
+      r_int:'Total interest', r_free:'Interest-free from', r_paid:'Paid off in', r_final:'Final repayment', r_tot:'Loan + interest',
+      per_12:'month', per_26:'fortnight', per_52:'week',
+      t_dep:'Deposit', t_duty:'Stamp duty', t_costs:'Other upfront costs', t_cash:'Cash at settlement', t_plusoff:'Plus offset balance',
+      t_contrib:'Contributed at purchase', t_valat:'Property value at year ', t_govthen:'Government share then',
+      t_above:'Cost above what they put in', t_yours:'Your share of the property',
+      s_bb_h:'When to buy the Government out',
+      s_bb_p:'Their equity accrues at whatever the property does; mortgage money accrues at your interest rate. Spare cash should always go against the dearer of the two.',
+      s_bb_caveat:'Two things the maths leaves out. The Government shares losses as well as gains, so their stake is quietly insuring part of your downside — worth keeping in a flat or falling market. And Housing Australia reviews your finances periodically and may require incremental payments once you can afford them, so the timing may not be entirely yours. Each buy-out also needs a valuation and legal work, so a few larger steps beat many small ones.',
+      t_bb_growth:'Growth on their share', t_bb_rate:'Your mortgage rate',
+      t_bb_be:'Break-even growth', t_bb_when:'Suggested trigger',
+      bb_asap:'As soon as you can', bb_flex:'Your call', bb_payoff:'Once the loan is clear',
+      bb_early:function(g,r){return '<b>Buy them out as early as you can.</b> At '+g+'% growth the Government’s share is compounding faster than your '+r+'% mortgage, which makes it the most expensive money you hold. Waiting costs you more than the interest you would pay to replace it, so refinancing to buy back their equity is worth pricing up with your lender.'},
+      bb_last:function(g,r,d){return '<b>Clear the mortgage first, buy them out last.</b> At '+g+'% growth the Government’s share is costing you less than your '+r+'% mortgage, so it is the cheapest money on your balance sheet. Put every spare dollar into the offset instead'+(d?' — from <b>'+d+'</b> the mortgage stops charging interest, and that is the moment to start buying the Government out, because further offset contributions save you nothing.':'.')},
+      bb_either:function(g,r){return '<b>It is close to a wash.</b> At '+g+'% growth the Government’s share costs about the same as your '+r+'% mortgage, so neither is clearly the better dollar to repay. Keep the flexibility, and remember their share absorbs its portion of any fall in value.'},
+      s_be_h:'Break-even values',
+      s_be_p:'Help to Buy costs you the Government’s slice of the growth and saves you interest. Below the break-even value the interest saved is worth more than the slice given up, so the scheme is paying you.',
+      t_be_proj:'Projected value at year ', t_be_star:'Help to Buy ahead below',
+      t_be_profit:'You repay less than they gave below', t_be_gbe:'Ahead while yearly growth stays under',
+      be_ahead:function(g,yr,v){return '<b>You are ahead — and stay ahead until year '+yr+'.</b> At '+g+'% growth the property passes the break-even value of '+v+' around then. Sell or buy the Government out before that point and Help to Buy will have cost you less than an ordinary loan.'},
+      be_behind:function(e,v,st){return '<b>Past break-even at year '+e+'.</b> The property is projected at '+v+', above the break-even value of '+st+', so by then the Government’s slice of the growth has outgrown the interest you saved. Exiting earlier keeps you on the right side of it.'},
+      be_never:function(g){return '<b>Ahead for the whole loan.</b> At '+g+'% growth the property never reaches the break-even value within your term, so Help to Buy costs less than an ordinary loan no matter when you exit.'},
+      be_profit_note:function(p,g){return 'The floor works in your favour too. Because the Government shares losses as well as gains, if the property is worth less than '+p+' when you buy back, you hand back less than the '+g+' they put in — the arrangement has literally paid you. That downside cover is the part people forget to price.'},
+      nav_intro:'About this calculator', nav_inputs:'Your figures', nav_summary:'Summary', nav_cash:'Cash at settlement',
+      nav_gov:'Government’s share', nav_buyback:'When to buy out', nav_breakeven:'Break-even values',
+      nav_chart:'Balance over time', nav_schedule:'Repayment schedule', nav_notes:'Notes',
+      nav_next:'Next', nav_prev:'Prev',
+      inputs_title:'Your figures',
+      btn_reset:'Reset to defaults',
+      autosave:'Entries save automatically', saved:'Saved to this browser',
+      restored:'Restored your last entries', wasreset:'Back to defaults',
+      nostore:'Saving unavailable in this browser',
+      yr:'Year ', lbl_12:'M', lbl_26:'F', lbl_52:'W',
+      key_free:'Green rows — interest-free.',
+      tbl_note:'From here the offset balance covers the remaining debt, so no interest is charged. The repayment stays the same but every dollar of it now goes to principal, and the balance falls in a straight line until it clears.',
+      foot1:'<b>How this calculates.</b> Repayments are the standard amortising amount for your loan, rate and term, and stay fixed. Interest each period is charged on the balance less your offset, so extra contributions cut interest rather than reducing the repayment. Once the offset covers the debt, interest falls to zero and further contributions stop — by default the loan is <em>not</em> discharged: you keep making the full repayment and carry the remaining balance interest-free until it clears, leaving the offset liquid. Tick <em>Discharge</em> to close the loan at that crossover instead. Stamp duty uses WA general and first-home rates in force from 7&nbsp;May&nbsp;2026 — the first-home concession ends at $800,000, so an $850,000 purchase pays the full general rate of $34,890.50.',
+      foot2:'An estimate only, not financial advice. Help to Buy has a hard income cap ($103,000 single / $165,000 joint, no exemptions), requires Australian citizenship, and requires you to contribute your maximum reasonable deposit — if your savings and borrowing capacity alone reach the purchase price you are not eligible. Confirm everything with a <a href="https://firsthomebuyers.gov.au/australian-government-help-buy-scheme">Participating Lender</a>.',
+      delta:function(sv,rp,per,ys,gp){return 'Help to Buy saves <b>'+sv+'</b> in interest and cuts your repayment by <b>'+rp+'</b> per '+per+(ys?', clearing the loan <b>'+ys+' years</b> sooner':'')+'. What it costs instead is '+gp+'% of the property’s value, priced below.'},
+      a_over:function(p){return '<b>Over the WA cap.</b> Help to Buy and the 5% Deposit Scheme both cap Perth metro purchases at $850,000. At '+p+' neither scheme is available. Outside Greater Perth the cap is $600,000.'},
+      a_at:'<b>Exactly at the cap.</b> $850,000 is the WA metro maximum, so there is no negotiating room — a single dollar more and you are out of the scheme. Confirm your postcode sits inside Greater Perth; elsewhere in WA the cap is $600,000.',
+      a_dep:function(m){return '<b>Below the minimum deposit.</b> Help to Buy requires at least 2% of the purchase price, or '+m+' here.'},
+      a_warn:function(g,e,pr,sv){return '<b>At '+g+'% growth, holding to year '+e+' costs more than it saves.</b> The Government share grows by '+pr+' while you save '+sv+' in interest across the whole loan. Whether buying them out early helps depends on how that growth compares with your mortgage rate — see below.'},
+      a_free:function(d,b,y,d2,fc,eo){return '<b>Interest stops on '+d+', with '+b+' still owing.</b> From there you carry the balance interest-free for '+y+' years until '+d2+', repaying '+fc+' of pure principal while '+eo+' stays liquid in the offset. Tick <em>Discharge</em> to close the loan at that point instead.'}
+    },
+    zh:{
+      eyebrow:'西澳州 · 共享產權',
+      h1:'Help to Buy 置業資助計算機',
+      sub:'以同一物業比較澳洲政府 Help to Buy 置業資助計劃與一般房貸：還款額、對沖賬戶，以及政府產權份額的實際代價。預設以珀斯 850,000 澳元物業計算。',
+      g_property:'物業', g_cash:'自備資金', g_loan:'貸款', g_offset:'對沖賬戶', g_growth:'資本增值',
+      l_price:'物業價值', h_price:'西澳市區上限 $850,000',
+      l_homeType:'物業類型', o_existing:'現有物業 — 最高 30%', o_new:'全新物業 — 最高 40%',
+      l_govpct:'政府出資比例',
+      l_deposit:'首期',
+      l_duty:'印花稅', c_dutyLock:'按西澳稅率自動計算',
+      duty_none:'自動 · 不適用優惠', duty_exempt:'自動 · 豁免', duty_conc:'自動 · 優惠稅率', duty_manual:'手動輸入',
+      l_costs:'其他前期費用', h_costs:'律師費、查冊等',
+      l_rate:'利率', l_term:'貸款年期', u_years:'年',
+      l_freq:'還款週期', o_monthly:'每月', o_fortnightly:'每兩週', o_weekly:'每週',
+      l_start:'成交日期', h_start:'首次還款於其後一期',
+      l_offset:'對沖賬戶初始結餘', l_extra:'額外存入對沖賬戶', h_extra:'每期',
+      c_discharge:'對沖結餘足夠時即時清償貸款',
+      dis_on:'開啟：對沖結餘一旦足以覆蓋欠款，即以該筆資金清償貸款並結清。',
+      dis_off:'關閉：繼續還款，餘額以免息方式持有。對沖結餘足夠覆蓋欠款後即停止存入。',
+      l_growth:'假設年增值率', h_growth:'用於計算政府份額', l_exit:'贖回或出售年份', u_yrs:'年',
+      s_cash_h:'成交時所需現金',
+      s_cash_p:'首期與各項費用由積蓄支付。對沖賬戶結餘屬另一筆資金，您仍可隨時動用。',
+      s_gov_h:'政府產權份額的代價',
+      s_gov_p:'政府出資部分不收取利息，但無論您日後贖回或出售物業，政府均按其比例分佔物業價值。',
+      s_chart_h:'貸款餘額走勢',
+      s_chart_p:'實線為未償還欠款，虛線為扣除對沖結餘後的淨額；淨額歸零時，利息即停止計算。',
+      leg_a:'Help to Buy — 欠款', leg_b:'Help to Buy — 扣除對沖後',
+      leg_c:'一般房貸 — 欠款', leg_d:'一般房貸 — 扣除對沖後',
+      s_sched_h:'還款明細表',
+      s_sched_p:'逐期列出還款、利息與本金，並附累計金額。',
+      btn_htb:'Help to Buy', btn_std:'一般房貸', btn_year:'按年匯總', btn_period:'逐期明細',
+      th_period:'期數', th_date:'日期', th_repay:'還款額', th_int:'利息', th_prin:'本金',
+      th_ci:'累計利息', th_cp:'累計本金', th_off:'對沖結餘', th_bal:'未償還餘額',
+      c_htb:'Help to Buy', c_htb_tag:'共享產權', c_std:'一般房貸', c_std_tag:'5% 首期計劃',
+      r_loan:'貸款金額', r_gov:'政府產權', r_dep:'您的首期', r_lvr:'貸款成數',
+      r_int:'利息總額', r_free:'免息起始日', r_paid:'還清年期', r_final:'最後還款日', r_tot:'本金加利息',
+      per_12:'月', per_26:'兩週', per_52:'週',
+      t_dep:'首期', t_duty:'印花稅', t_costs:'其他前期費用', t_cash:'成交所需現金', t_plusoff:'另加對沖結餘',
+      t_contrib:'購入時政府出資', t_valat:'物業價值於第 ', t_govthen:'屆時政府份額',
+      t_above:'高於出資額的代價', t_yours:'您所佔物業份額',
+      s_bb_h:'何時贖回政府產權',
+      s_bb_p:'政府份額按物業升值速度累積，按揭則按利率累積。多餘資金應優先償還成本較高的一方。',
+      s_bb_caveat:'計算未涵蓋的兩點。政府同時分擔跌幅，其份額等於為您分攤部分下行風險，在樓市平穩或下跌時值得保留。此外，Housing Australia 會定期檢視您的財務狀況，並可能在您有能力時要求分階段供款，故時機未必完全由您掌握。每次贖回亦需估值及法律程序，分數次大額進行較多次小額划算。',
+      t_bb_growth:'政府份額增值率', t_bb_rate:'您的按揭利率',
+      t_bb_be:'收支平衡增值率', t_bb_when:'建議時機',
+      bb_asap:'盡早進行', bb_flex:'由您決定', bb_payoff:'待貸款清還後',
+      bb_early:function(g,r){return '<b>應盡早贖回。</b>在 '+g+'% 增值率下，政府份額的累積速度快於您 '+r+'% 的按揭利率，屬您手上成本最高的資金。每拖延一年，代價均高於為此借貸所需支付的利息，因此值得與貸款機構商討以再融資方式贖回。'},
+      bb_last:function(g,r,d){return '<b>先清還按揭，最後才贖回政府產權。</b>在 '+g+'% 增值率下，政府份額的成本低於您 '+r+'% 的按揭利率，屬資產負債表上最便宜的資金。多餘資金應優先存入對沖賬戶'+(d?' — 由 <b>'+d+'</b> 起按揭不再計息，屆時再存入對沖已無任何節省，正是開始贖回政府產權的時機。':'。')},
+      bb_either:function(g,r){return '<b>兩者相差無幾。</b>在 '+g+'% 增值率下，政府份額的成本與您 '+r+'% 的按揭利率相若，並無明顯較優先償還的一方。建議保留靈活性，並留意政府份額同時分擔物業跌幅。'},
+      s_be_h:'收支平衡樓價',
+      s_be_p:'Help to Buy 的代價是政府分佔的升值部分，回報則是節省的利息。當樓價低於收支平衡點時，節省的利息高於讓出的升值，計劃即為您帶來淨收益。',
+      t_be_proj:'預計樓價於第 ', t_be_star:'低於此價 Help to Buy 較划算',
+      t_be_profit:'低於此價贖回少於政府出資', t_be_gbe:'年增值率低於此數即佔優',
+      be_ahead:function(g,yr,v){return '<b>目前佔優，並可維持至第 '+yr+' 年。</b>在 '+g+'% 增值率下，樓價約於該時突破收支平衡點 '+v+'。若在此之前出售或贖回政府產權，Help to Buy 的總成本將低於一般房貸。'},
+      be_behind:function(e,v,st){return '<b>第 '+e+' 年已超過收支平衡點。</b>預計樓價為 '+v+'，高於平衡點 '+st+'，屆時政府分佔的升值已超過您所節省的利息。提早退出方能保持優勢。'},
+      be_never:function(g){return '<b>整個貸款期均佔優。</b>在 '+g+'% 增值率下，樓價於年期內始終未達收支平衡點，故無論何時退出，Help to Buy 的成本均低於一般房貸。'},
+      be_profit_note:function(p,g){return '下行保障同樣對您有利。由於政府同時分擔跌幅，若贖回時樓價低於 '+p+'，您交還的金額將少於政府投入的 '+g+' — 等於計劃實際為您帶來收益。這項下行保障，正是一般人忽略計算的部分。'},
+      nav_intro:'關於本計算機', nav_inputs:'你的數據', nav_summary:'摘要', nav_cash:'成交所需現金',
+      nav_gov:'政府產權份額', nav_buyback:'何時贖回', nav_breakeven:'收支平衡樓價',
+      nav_chart:'餘額走勢', nav_schedule:'還款明細', nav_notes:'重要事項',
+      nav_next:'下一項', nav_prev:'上一項',
+      inputs_title:'你的數據',
+      btn_reset:'回復預設值',
+      autosave:'輸入會自動儲存', saved:'已儲存至此瀏覽器',
+      restored:'已載入上次輸入', wasreset:'已回復預設值',
+      nostore:'此瀏覽器無法儲存',
+      yr:'第 ', lbl_12:'月', lbl_26:'期', lbl_52:'週',
+      key_free:'綠色行 — 免息期。',
+      tbl_note:'由此開始，對沖結餘已足以覆蓋餘下欠款，故不再計算利息。還款額維持不變，但全數用於償還本金，餘額呈直線下降直至清零。',
+      foot1:'<b>計算方式。</b>還款額按貸款金額、利率及年期以標準攤還法計算，並維持固定。每期利息按「餘額減對沖結餘」計算，因此額外存入會減少利息，而非降低還款額。當對沖結餘足以覆蓋欠款時，利息降至零，並停止繼續存入；預設<em>不會</em>清償貸款，而是繼續全額還款，餘額以免息方式持有直至還清，對沖資金保持可動用。勾選<em>即時清償</em>則於該時點結清貸款。印花稅採用 2026 年 5 月 7 日起生效的西澳一般稅率及首次置業稅率 — 首次置業優惠上限為 $800,000，故 $850,000 物業須繳付全額一般稅率 $34,890.50。',
+      foot2:'本計算僅供參考，並非財務建議。Help to Buy 設有嚴格入息上限（單人 $103,000；聯名或單親 $165,000，概不豁免），申請人必須為澳洲公民，並須投入合理範圍內的最高首期 — 若您的積蓄與借貸能力已足以購入該物業，則不符合資格。所有細節請向<a href="https://firsthomebuyers.gov.au/australian-government-help-buy-scheme">參與計劃的貸款機構</a>確認。',
+      delta:function(sv,rp,per,ys,gp){return 'Help to Buy 可節省利息 <b>'+sv+'</b>，每'+per+'還款減少 <b>'+rp+'</b>'+(ys?'，並提早 <b>'+ys+' 年</b>還清':'')+'。代價是物業價值的 '+gp+'%，詳見下方。'},
+      a_over:function(p){return '<b>超出西澳上限。</b>Help to Buy 與 5% 首期計劃於珀斯市區的物業價格上限均為 $850,000。'+p+' 已超出上限，兩項計劃均不適用。大珀斯以外地區上限為 $600,000。'},
+      a_at:'<b>剛好等於上限。</b>$850,000 為西澳市區上限，議價空間為零 — 只要多出一元即不符合計劃資格。請確認郵遞區號位於大珀斯範圍內；西澳其他地區上限為 $600,000。',
+      a_dep:function(m){return '<b>低於最低首期要求。</b>Help to Buy 要求首期不少於樓價的 2%，即 '+m+'。'},
+      a_warn:function(g,e,pr,sv){return '<b>在 '+g+'% 增值率下，持有至第 '+e+' 年的代價高於所節省的利息。</b>政府份額增值 '+pr+'，而整筆貸款只節省利息 '+sv+'。是否應及早贖回，須視乎增值率與您的按揭利率孰高 — 詳見下方分析。'},
+      a_free:function(d,b,y,d2,fc,eo){return '<b>利息於 '+d+' 停止計算，當時尚欠 '+b+'。</b>其後以免息方式持有餘額 '+y+' 年至 '+d2+'，期間償還純本金 '+fc+'，同時對沖賬戶保留 '+eo+' 可隨時動用。勾選<em>即時清償</em>則於該時點結清貸款。'}
+    }
+  };
+
+  var lang='en';
+  try{ var sv=localStorage.getItem('htb_lang'); if(sv==='zh'||sv==='en') lang=sv; }catch(e){}
+  function t(k){ return STR[lang][k] }
+
+  function fmt(n){return '$'+Math.round(n).toLocaleString('en-AU')}
+  function fmt2(n){return '$'+n.toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2})}
+
+  function periodDate(startStr,i,perYear){
+    var p=(startStr||'').split('-');
+    if(p.length!==3) return null;
+    var y=+p[0], m=+p[1], d=+p[2];
+    if(!y||!m||!d) return null;
+    if(perYear===12){
+      var tm=m-1+i, ty=y+Math.floor(tm/12), mm=((tm%12)+12)%12;
+      var last=new Date(Date.UTC(ty,mm+1,0)).getUTCDate();
+      return new Date(Date.UTC(ty,mm,Math.min(d,last)));
+    }
+    var days=perYear===26?14:7;
+    return new Date(Date.UTC(y,m-1,d)+i*days*86400000);
+  }
+  function fmtDate(dt){
+    if(!dt) return '—';
+    return dt.toLocaleDateString(lang==='zh'?'zh-Hant-TW':'en-AU',
+      {day:'numeric',month:lang==='zh'?'numeric':'short',year:'numeric',timeZone:'UTC'});
+  }
+
+  function generalDuty(v){
+    if(v<=0)return 0;
+    if(v<=120000)return Math.ceil(v/100)*1.90;
+    if(v<=150000)return 2280+Math.ceil((v-120000)/100)*2.85;
+    if(v<=360000)return 3135+Math.ceil((v-150000)/100)*3.80;
+    if(v<=725000)return 11115+Math.ceil((v-360000)/100)*4.75;
+    return 28453+Math.ceil((v-725000)/100)*5.15;
+  }
+  function fhorDuty(v){
+    if(v<=600000)return 0;
+    if(v<=800000)return Math.ceil((v-600000)/100)*16.15;
+    return generalDuty(v);
+  }
+
+  function amortise(principal,annualRate,years,perYear,offset0,extra,dischargeMode){
+    var r=annualRate/100/perYear, n=Math.round(years*perYear);
+    var repay;
+    if(principal<=0){repay=0}
+    else if(r<=0){repay=principal/n}
+    else{repay=principal*r/(1-Math.pow(1+r,-n))}
+    var bal=principal, off=offset0, ci=0, cp=0, rows=[], start=principal;
+    var freeFrom=null, freeCash=0;
+    for(var i=1;i<=n && bal>0.01;i++){
+      var eff=Math.max(0,bal-off);
+      var intr=eff*r;
+      var prin=repay-intr;
+      if(prin<0)prin=0;
+      if(prin>bal)prin=bal;
+      bal-=prin; ci+=intr; cp+=prin;
+      if(off<bal) off+=extra;
+      rows.push({i:i,pay:intr+prin,int:intr,prin:prin,ci:ci,cp:cp,off:off,bal:bal,free:intr<=0.005});
+      if(intr<=0.005){ freeCash+=intr+prin; if(freeFrom===null && bal>0.01) freeFrom=i }
+      if(dischargeMode && off>=bal && bal>0.01){
+        cp+=bal;
+        rows.push({i:i+1,pay:bal,int:0,prin:bal,ci:ci,cp:cp,off:off-bal,bal:0,discharge:true,free:true});
+        bal=0;
+      }
+    }
+    return {repay:repay,rows:rows,start:start,totalInterest:ci,totalPrincipal:cp,
+            periods:rows.length,scheduled:n,perYear:perYear,
+            freeFrom:freeFrom,freeCash:freeCash,endOffset:off};
+  }
+
+  var state={scheme:'htb',view:'year'},A={},B={},ctx={};
+
+  // ---- input persistence -------------------------------------------------
+  var FIELDS=['price','homeType','govpct','deposit','duty','dutyLock','costs','rate','term',
+              'freq','start','offset','extra','dischargeChk','growth','exit'];
+  var DEFAULTS={};
+  FIELDS.forEach(function(id){
+    var el=$(id); DEFAULTS[id] = el.type==='checkbox' ? el.checked : el.value;
+  });
+
+  var storeOK=true, stateMsg='';
+  function setSaveMsg(key,on){
+    stateMsg=key;
+    var el=$('saveState');
+    el.className='savestate'+(on?' on':'');
+    el.innerHTML=(on?'<i></i>':'')+t(key);
+  }
+  function saveState(){
+    if(!storeOK) return;
+    try{
+      var o={};
+      FIELDS.forEach(function(id){
+        var el=$(id); o[id] = el.type==='checkbox' ? el.checked : el.value;
+      });
+      o._scheme=state.scheme; o._view=state.view;
+      localStorage.setItem('htb_inputs',JSON.stringify(o));
+      setSaveMsg('saved',true);
+    }catch(e){
+      storeOK=false; setSaveMsg('nostore',false);
+    }
+  }
+  // Coalesce repaints to one per animation frame while typing, and defer the
+  // schedule table (up to ~1,560 rows) until input settles.
+  var rafId=null, tableTimer=null;
+  function scheduleRender(){
+    if(rafId!==null) return;
+    rafId=requestAnimationFrame(function(){
+      rafId=null;
+      render();
+      scheduleTable();
+    });
+  }
+  function scheduleTable(){
+    if(tableTimer) clearTimeout(tableTimer);
+    tableTimer=setTimeout(function(){ tableTimer=null; table() },180);
+  }
+  function renderAll(){ render(); table() }
+  function loadState(){
+    try{
+      var raw=localStorage.getItem('htb_inputs');
+      if(!raw) return false;
+      var o=JSON.parse(raw);
+      if(!o || typeof o!=='object') return false;
+      FIELDS.forEach(function(id){
+        if(!(id in o)) return;
+        var el=$(id);
+        if(el.type==='checkbox') el.checked=!!o[id];
+        else if(o[id]!==null && o[id]!==undefined && o[id]!=='') el.value=o[id];
+      });
+      if(o._scheme==='htb'||o._scheme==='std') state.scheme=o._scheme;
+      if(o._view==='year'||o._view==='period') state.view=o._view;
+      return true;
+    }catch(e){ storeOK=false; return false }
+  }
+  function resetState(){
+    try{ localStorage.removeItem('htb_inputs') }catch(e){}
+    FIELDS.forEach(function(id){
+      var el=$(id);
+      if(el.type==='checkbox') el.checked=DEFAULTS[id]; else el.value=DEFAULTS[id];
+    });
+    state.scheme='htb'; state.view='year';
+    syncSegs();
+    setSaveMsg('wasreset',false);
+    renderAll();
+  }
+  function syncSegs(){
+    Array.prototype.forEach.call($('schemeSeg').querySelectorAll('button'),function(b){
+      b.setAttribute('aria-pressed',String(b.getAttribute('data-s')===state.scheme));
+    });
+    Array.prototype.forEach.call($('viewSeg').querySelectorAll('button'),function(b){
+      b.setAttribute('aria-pressed',String(b.getAttribute('data-v')===state.view));
+    });
+  }
+
+  function applyLang(){
+    document.documentElement.lang = lang==='zh'?'zh-Hant':'en-AU';
+    var els=document.querySelectorAll('[data-i18n]');
+    for(var i=0;i<els.length;i++){
+      var v=STR[lang][els[i].getAttribute('data-i18n')];
+      if(typeof v==='string') els[i].textContent=v;
+    }
+    var hs=document.querySelectorAll('[data-i18n-html]');
+    for(var j=0;j<hs.length;j++){
+      var h=STR[lang][hs[j].getAttribute('data-i18n-html')];
+      if(typeof h==='string') hs[j].innerHTML=h;
+    }
+    var ls=$('langSeg').querySelectorAll('button');
+    for(var k=0;k<ls.length;k++) ls[k].setAttribute('aria-pressed',String(ls[k].getAttribute('data-l')===lang));
+  }
+
+  function read(){
+    function v(id){var x=parseFloat($(id).value);return isNaN(x)?0:x}
+    var price=Math.max(0,v('price'));
+    if($('dutyLock').checked){
+      $('duty').value=Math.round(fhorDuty(price));
+      $('dutyAuto').textContent = price>800000?t('duty_none'):(price<=600000?t('duty_exempt'):t('duty_conc'));
+    }else{ $('dutyAuto').textContent=t('duty_manual') }
+    return {price:price,govpct:Math.max(0,v('govpct')),deposit:Math.max(0,v('deposit')),
+      duty:Math.max(0,v('duty')),costs:Math.max(0,v('costs')),rate:v('rate'),term:Math.max(1,v('term')),
+      perYear:parseInt($('freq').value,10),offset:Math.max(0,v('offset')),extra:Math.max(0,v('extra')),
+      discharge:$('dischargeChk').checked,start:$('start').value,
+      growth:v('growth'),exit:Math.max(1,v('exit')),homeType:$('homeType').value};
+  }
+
+  function tile(k,v,em){return '<div class="tile'+(em?' em':'')+'"><div class="tk">'+k+'</div><div class="tv">'+v+'</div></div>'}
+
+  function render(){
+    var s=read(); ctx=s;
+    var govMax = s.homeType==='new'?40:30;
+    if(s.govpct>govMax){$('govpct').value=govMax;s.govpct=govMax}
+    $('govpct').max=govMax;
+    var gov=s.price*s.govpct/100;
+    var loanA=Math.max(0,s.price-s.deposit-gov);
+    var loanB=Math.max(0,s.price-s.deposit);
+    $('depPct').textContent = s.price>0 ? (s.deposit/s.price*100).toFixed(1)+'%' : '—';
+
+    A=amortise(loanA,s.rate,s.term,s.perYear,s.offset,s.extra,s.discharge);
+    B=amortise(loanB,s.rate,s.term,s.perYear,s.offset,s.extra,s.discharge);
+    $('dischargeHint').textContent = s.discharge ? t('dis_on') : t('dis_off');
+
+    var per = t('per_'+s.perYear);
+    var yrsA=A.periods/s.perYear, yrsB=B.periods/s.perYear;
+
+    function card(name,tag,lead,a,loan,govAmt){
+      var lvr = s.price>0 ? loan/s.price*100 : 0;
+      return '<div class="card'+(lead?' lead':'')+'">'+
+        '<div class="card-top"><div class="card-name">'+name+'</div><div class="tag">'+tag+'</div></div>'+
+        '<div class="card-body">'+
+        '<div class="big">'+fmt(a.repay)+' <small>'+(lang==='zh'?('／'+per):('per '+per))+'</small></div>'+
+        '<div class="rows">'+
+        '<div class="row"><span class="k">'+t('r_loan')+'</span><span class="v">'+fmt(loan)+'</span></div>'+
+        (govAmt!==null?'<div class="row"><span class="k">'+t('r_gov')+'</span><span class="v gov">'+fmt(govAmt)+'</span></div>':'')+
+        '<div class="row"><span class="k">'+t('r_dep')+'</span><span class="v">'+fmt(s.deposit)+'</span></div>'+
+        '<div class="row"><span class="k">'+t('r_lvr')+'</span><span class="v">'+lvr.toFixed(1)+'%</span></div>'+
+        '<div class="row"><span class="k">'+t('r_int')+'</span><span class="v">'+fmt(a.totalInterest)+'</span></div>'+
+        '<div class="row"><span class="k">'+t('r_free')+'</span><span class="v good">'+(a.freeFrom?fmtDate(periodDate(s.start,a.freeFrom,s.perYear)):'—')+'</span></div>'+
+        '<div class="row"><span class="k">'+t('r_paid')+'</span><span class="v">'+(a.periods/s.perYear).toFixed(1)+' '+t('u_yrs')+'</span></div>'+
+        '<div class="row"><span class="k">'+t('r_final')+'</span><span class="v">'+fmtDate(periodDate(s.start,a.periods,s.perYear))+'</span></div>'+
+        '<div class="row"><span class="k">'+t('r_tot')+'</span><span class="v">'+fmt(a.totalInterest+loan)+'</span></div>'+
+        '</div></div></div>';
+    }
+    $('cards').innerHTML =
+      card(t('c_htb'),t('c_htb_tag'),true,A,loanA,gov)+
+      card(t('c_std'),t('c_std_tag'),false,B,loanB,null);
+
+    var saved=B.totalInterest-A.totalInterest;
+    var yrSaved=yrsB-yrsA;
+    $('delta').innerHTML=t('delta')(fmt(saved),fmt(B.repay-A.repay),per,yrSaved>0.05?yrSaved.toFixed(1):null,s.govpct.toFixed(0));
+
+    var cash=s.deposit+s.duty+s.costs;
+    $('cashTiles').innerHTML=
+      tile(t('t_dep'),fmt(s.deposit))+tile(t('t_duty'),fmt(s.duty))+
+      tile(t('t_costs'),fmt(s.costs))+tile(t('t_cash'),fmt(cash),true)+
+      tile(t('t_plusoff'),fmt(s.offset));
+
+    var g=s.growth/100, fv=s.price*Math.pow(1+g,s.exit);
+    var govThen=fv*s.govpct/100, premium=govThen-gov, yours=fv-govThen;
+    $('govTiles').innerHTML=
+      tile(t('t_contrib'),fmt(gov))+
+      tile(t('t_valat')+s.exit+(lang==='zh'?' 年':''),fmt(fv))+
+      tile(t('t_govthen'),fmt(govThen))+
+      tile(t('t_above'),fmt(premium),true)+
+      tile(t('t_yours'),fmt(yours));
+
+    // ---- when to buy the Government out -------------------------------
+    // Their equity accrues at the property's growth rate; mortgage money
+    // accrues at the interest rate. Put spare cash against the dearer one.
+    var gap=s.growth-s.rate;
+    var mode = gap>0.5 ? 'early' : (gap<-0.5 ? 'last' : 'either');
+    var freeD = A.freeFrom ? fmtDate(periodDate(s.start,A.freeFrom,s.perYear)) : null;
+    $('bbVerdict').className='note '+(mode==='early'?'warn':'ok');
+    $('bbVerdict').innerHTML=t('bb_'+mode)(s.growth,s.rate,freeD);
+    $('bbTiles').innerHTML=
+      tile(t('t_bb_growth'),s.growth.toFixed(2)+'%')+
+      tile(t('t_bb_rate'),s.rate.toFixed(2)+'%')+
+      tile(t('t_bb_be'),s.rate.toFixed(2)+'%')+
+      tile(t('t_bb_when'), mode==='early'?t('bb_asap'):(mode==='last'?(freeD||t('bb_payoff')):t('bb_flex')), true);
+
+    // ---- break-even property values -----------------------------------
+    // Cost of HtB  = interest_A + (their share at T - their contribution)
+    // Cost of loan = interest_B
+    // HtB is ahead while  V(T) < price + interest_saved(T) / govPct
+    function intAtYear(o,yr){
+      var k=Math.min(Math.round(yr*s.perYear),o.rows.length)-1;
+      return k<0?0:o.rows[k].ci;
+    }
+    function breakEven(yr){
+      if(s.govpct<=0) return Infinity;
+      return s.price + (intAtYear(B,yr)-intAtYear(A,yr))/(s.govpct/100);
+    }
+    var beStar=breakEven(s.exit);
+    // The growth rate that would land exactly on break-even at the exit year.
+    var beGrowth = (!isFinite(beStar)||beStar<=s.price||s.price<=0)
+      ? null : (Math.pow(beStar/s.price,1/s.exit)-1)*100;
+    var cross=null;
+    if(s.growth>0 && s.govpct>0){
+      for(var yq=1;yq<=Math.ceil(s.term);yq++){
+        if(s.price*Math.pow(1+g,yq) > breakEven(yq)){ cross=yq; break }
+      }
+    }
+    $('beVerdict').className='note '+(fv>beStar?'warn':'ok');
+    $('beVerdict').innerHTML = fv>beStar
+      ? t('be_behind')(s.exit,fmt(fv),fmt(beStar))
+      : (cross ? t('be_ahead')(s.growth,cross,fmt(breakEven(cross))) : t('be_never')(s.growth));
+    $('beTiles').innerHTML=
+      tile(t('t_be_proj')+s.exit+(lang==='zh'?' 年':''),fmt(fv))+
+      tile(t('t_be_star'),isFinite(beStar)?fmt(beStar):'—',true)+
+      tile(t('t_be_profit'),fmt(s.price))+
+      tile(t('t_be_gbe'),beGrowth===null?'—':beGrowth.toFixed(2)+'%');
+    $('beProfit').innerHTML=t('be_profit_note')(fmt(s.price),fmt(gov));
+
+    var al=[];
+    if(s.price>850000) al.push(['bad',t('a_over')(fmt(s.price))]);
+    else if(s.price===850000) al.push(['warn',t('a_at')]);
+    if(s.price>0 && s.deposit/s.price<0.02) al.push(['bad',t('a_dep')(fmt(s.price*0.02))]);
+    if(premium>saved) al.push(['warn',t('a_warn')(s.growth,s.exit,fmt(premium),fmt(saved))]);
+    if(!s.discharge && A.freeFrom){
+      var freeYrs=(A.periods-A.freeFrom+1)/s.perYear;
+      al.push(['ok',t('a_free')(fmtDate(periodDate(s.start,A.freeFrom,s.perYear)),fmt(A.rows[A.freeFrom-1].bal),
+        freeYrs.toFixed(1),fmtDate(periodDate(s.start,A.periods,s.perYear)),fmt(A.freeCash),fmt(A.endOffset))]);
+    }
+    $('alerts').innerHTML=al.map(function(a){return '<div class="note '+a[0]+'">'+a[1]+'</div>'}).join('')+(al.length?'<div style="height:16px"></div>':'');
+
+    drawChart(A,B,s.perYear);
+  }
+
+  function drawChart(a,b,perYear){
+    // Narrow viewBox on phones so labels stay legible once the SVG is scaled down.
+    var cw=$('chart').clientWidth||760, narrow=cw<560;
+    var W=narrow?400:760, H=narrow?290:300;
+    var mL=narrow?46:64, mR=narrow?10:14, mT=narrow?12:14, mB=narrow?42:50;
+    var fs=narrow?12:11, fsAx=narrow?11:10;
+    var maxP=Math.max(a.scheduled,b.scheduled,1);
+    var maxV=Math.max(a.start,b.start,1);
+    // "nice" tick step targeting a readable number of gridlines
+    var raw=maxV/(narrow?5:9), mag=Math.pow(10,Math.floor(Math.log10(raw))), nm=raw/mag;
+    var step=(nm<=1?1:nm<=2?2:nm<=2.5?2.5:nm<=5?5:10)*mag;
+    var top=Math.ceil(maxV/step)*step;
+    function x(i){return mL+(i/maxP)*(W-mL-mR)}
+    function y(v){return mT+(1-v/top)*(H-mT-mB)}
+    function path(o,key){
+      if(!o.rows.length)return '';
+      var d='M'+x(0).toFixed(1)+','+y(o.start).toFixed(1);
+      for(var i=0;i<o.rows.length;i++){
+        var v = key==='net' ? Math.max(0,o.rows[i].bal-o.rows[i].off) : o.rows[i].bal;
+        d+='L'+x(o.rows[i].i).toFixed(1)+','+y(v).toFixed(1);
+      }
+      return d;
+    }
+    var gl='',ticks='';
+    for(var v=0;v<=top+1;v+=step){
+      gl+='<line x1="'+mL+'" y1="'+y(v).toFixed(1)+'" x2="'+(W-mR)+'" y2="'+y(v).toFixed(1)+'" stroke="var(--border)" stroke-width="1"/>';
+      ticks+='<text x="'+(mL-7)+'" y="'+(y(v)+4).toFixed(1)+'" text-anchor="end" font-size="'+fs+'" font-family="IBM Plex Mono, monospace" fill="var(--faint)">'+(v>=1000?'$'+Math.round(v/1000)+'k':'$0')+'</text>';
+    }
+    var xt='',yrs=Math.max(1,Math.round(maxP/perYear));
+    var sy=narrow?(yrs>20?10:(yrs>8?5:2)):(yrs>20?5:(yrs>8?2:1));
+    for(var yy=0;yy<=yrs;yy+=sy){
+      xt+='<text x="'+x(yy*perYear).toFixed(1)+'" y="'+(H-(narrow?26:30))+'" text-anchor="middle" font-size="'+fs+'" font-family="IBM Plex Mono, monospace" fill="var(--faint)">'+yy+'</text>';
+    }
+    xt+='<text x="'+((mL+W-mR)/2).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-size="'+fsAx+'" letter-spacing="1" fill="var(--faint)">'+(lang==='zh'?'年':'YEARS')+'</text>';
+    $('chart').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+t('s_chart_h')+'">'+
+      gl+ticks+xt+
+      '<path d="'+path(b,'bal')+'" fill="none" stroke="var(--gov)" stroke-width="2"/>'+
+      '<path d="'+path(b,'net')+'" fill="none" stroke="var(--gov)" stroke-width="1.6" stroke-dasharray="4 3" opacity=".55"/>'+
+      '<path d="'+path(a,'bal')+'" fill="none" stroke="var(--accent)" stroke-width="2.2"/>'+
+      '<path d="'+path(a,'net')+'" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-dasharray="4 3" opacity=".55"/>'+
+      '<line x1="'+mL+'" y1="'+y(0).toFixed(1)+'" x2="'+(W-mR)+'" y2="'+y(0).toFixed(1)+'" stroke="var(--border-strong)" stroke-width="1"/>'+
+      '</svg>';
+  }
+
+  function table(){
+    var a = state.scheme==='htb'?A:B, py=ctx.perYear, rows=a.rows, out=[];
+    var label=t('lbl_'+py);
+    if(state.view==='year'){
+      var accI=0,accP=0,accPay=0,yr=1,n=0;
+      for(var i=0;i<rows.length;i++){
+        accI+=rows[i].int;accP+=rows[i].prin;accPay+=rows[i].pay;n++;
+        if(n===py||i===rows.length-1){
+          out.push('<tr class="yr'+(accI<=0.005?' free':'')+'"><td>'+t('yr')+yr+(lang==='zh'?' 年':'')+'</td><td>'+fmtDate(periodDate(ctx.start,rows[i].i,py))+'</td><td>'+fmt(accPay)+'</td><td>'+fmt(accI)+'</td><td>'+fmt(accP)+
+            '</td><td>'+fmt(rows[i].ci)+'</td><td>'+fmt(rows[i].cp)+'</td><td>'+fmt(rows[i].off)+'</td><td>'+fmt(rows[i].bal)+'</td></tr>');
+          accI=0;accP=0;accPay=0;n=0;yr++;
+        }
+      }
+    }else{
+      for(var j=0;j<rows.length;j++){
+        var r=rows[j];
+        out.push('<tr'+(r.discharge?' class="yr"':(r.free?' class="free"':''))+'><td>'+label+' '+r.i+'</td><td>'+fmtDate(periodDate(ctx.start,r.i,py))+'</td><td>'+fmt2(r.pay)+'</td><td>'+fmt2(r.int)+'</td><td>'+fmt2(r.prin)+
+          '</td><td>'+fmt(r.ci)+'</td><td>'+fmt(r.cp)+'</td><td>'+fmt(r.off)+'</td><td>'+fmt(r.bal)+'</td></tr>');
+      }
+    }
+    $('tbody').innerHTML=out.join('');
+  }
+
+  function seg(id,attr,key){
+    $(id).addEventListener('click',function(e){
+      var b=e.target.closest('button'); if(!b)return;
+      Array.prototype.forEach.call(this.querySelectorAll('button'),function(x){x.setAttribute('aria-pressed',String(x===b))});
+      state[key]=b.getAttribute(attr); table(); saveState();
+    });
+  }
+  seg('schemeSeg','data-s','scheme');
+  seg('viewSeg','data-v','view');
+
+  $('langSeg').addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b)return;
+    lang=b.getAttribute('data-l');
+    try{ localStorage.setItem('htb_lang',lang) }catch(err){}
+    applyLang(); setSaveMsg(stateMsg||'saved',stateMsg==='saved'); renderAll(); setView(curView,false);
+  });
+
+  $('resetBtn').addEventListener('click',resetState);
+  $('homeType').addEventListener('change',function(){ $('govpct').value = this.value==='new'?40:30 });
+
+  // Typing only recalculates — never writes to storage.
+  $('f').addEventListener('input',scheduleRender);
+
+  // Commit points: blur, Enter, or a dropdown/checkbox/date change.
+  $('f').addEventListener('change',function(){ scheduleRender(); saveState() });
+  $('f').addEventListener('focusout',saveState);
+  $('f').addEventListener('submit',function(e){ e.preventDefault() });
+  $('f').addEventListener('keydown',function(e){
+    if(e.key==='Enter'&&e.target.tagName==='INPUT'){ e.preventDefault(); e.target.blur() }
+  });
+
+  // Safety net: persist if the tab is closed or hidden mid-edit.
+  window.addEventListener('pagehide',saveState);
+  document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='hidden') saveState() });
+
+  // Numeric keypad on phones
+  Array.prototype.forEach.call(document.querySelectorAll('input[type=number]'),function(el){
+    el.setAttribute('inputmode','decimal');
+  });
+
+  var MOBILE=900;
+  function isMobile(){ return window.innerWidth<=MOBILE }
+  function setInputsOpen(open){
+    $('inputsToggle').setAttribute('aria-expanded',String(open));
+    $('inputsBody').hidden=!open;
+  }
+  $('inputsToggle').addEventListener('click',function(){
+    setInputsOpen(this.getAttribute('aria-expanded')!=='true');
+  });
+
+  // ---- one-section-at-a-time navigation on small screens ----------------
+  var VIEWS=['v-intro','v-inputs','v-summary','v-cash','v-gov','v-buyback','v-breakeven',
+             'v-chart','v-schedule','v-notes'];
+  var curView='v-summary';
+
+  // The language toggle lives in the header, which becomes its own view on
+  // mobile — so move it into the menu there to keep it always reachable.
+  function placeLang(){
+    var seg=$('langSeg'), target=isMobile()?$('navMenu'):$('hrow');
+    if(seg.parentNode!==target) target.appendChild(seg);
+    seg.classList.toggle('inmenu',isMobile());
+  }
+
+  function openMenu(open){
+    $('navMenu').hidden=!open;
+    $('navScrim').hidden=!open;
+    $('navBtn').setAttribute('aria-expanded',String(open));
+  }
+
+  function setView(id,scroll){
+    if(VIEWS.indexOf(id)<0) id='v-summary';
+    curView=id;
+    var on=isMobile();
+    placeLang();
+    Array.prototype.forEach.call(document.querySelectorAll('[data-view]'),function(el){
+      el.hidden = on && el.getAttribute('data-view')!==id;
+    });
+    $('mnav').hidden=!on;
+    $('navTitle').textContent=on?t('nav_'+id.slice(2)):'';
+    Array.prototype.forEach.call($('navMenu').querySelectorAll('button'),function(b){
+      b.classList.toggle('on',b.getAttribute('data-go')===id);
+    });
+    // Prev / Next pager
+    var idx=VIEWS.indexOf(id), prv=VIEWS[idx-1], nxt=VIEWS[idx+1];
+    $('pager').hidden=!on;
+    $('prevBtn').disabled=!prv;
+    $('nextBtn').disabled=!nxt;
+    $('prevBtn').innerHTML='<span class="pl">‹ '+t('nav_prev')+'</span>'+
+      '<span class="pn">'+(prv?t('nav_'+prv.slice(2)):'')+'</span>';
+    $('nextBtn').innerHTML='<span class="pl">'+t('nav_next')+' ›</span>'+
+      '<span class="pn">'+(nxt?t('nav_'+nxt.slice(2)):'')+'</span>';
+    // these two measure or rebuild on show, so refresh once visible
+    if(on&&id==='v-chart'&&A.rows) drawChart(A,B,ctx.perYear);
+    if(on&&id==='v-schedule') table();
+    openMenu(false);
+    if(scroll) window.scrollTo(0,0);
+    syncPagerSpace();
+  }
+
+  // Reserve room at the foot of the page so the fixed pager never covers content.
+  function syncPagerSpace(){
+    var p=$('pager'), w=document.querySelector('.wrap');
+    if(p.hidden){ w.style.paddingBottom=''; return }
+    w.style.paddingBottom=Math.round(p.getBoundingClientRect().height+26)+'px';
+  }
+
+  $('navBtn').addEventListener('click',function(){
+    openMenu($('navMenu').hidden);
+  });
+  $('navScrim').addEventListener('click',function(){ openMenu(false) });
+  $('navMenu').addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b)return;
+    if(!b.hasAttribute('data-go')) return;   // the language toggle also lives here
+    setView(b.getAttribute('data-go'),true);
+  });
+  $('nextBtn').addEventListener('click',function(){
+    var i=VIEWS.indexOf(curView);
+    if(VIEWS[i+1]) setView(VIEWS[i+1],true);
+  });
+  $('prevBtn').addEventListener('click',function(){
+    var i=VIEWS.indexOf(curView);
+    if(i>0) setView(VIEWS[i-1],true);
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'&&!$('navMenu').hidden) openMenu(false);
+  });
+
+  var rsTimer=null;
+  window.addEventListener('resize',function(){
+    if(rsTimer) clearTimeout(rsTimer);
+    rsTimer=setTimeout(function(){
+      rsTimer=null;
+      setInputsOpen(true);   // the nav handles showing/hiding now
+      setView(curView,false);
+      if(A.rows) drawChart(A,B,ctx.perYear);
+    },150);
+  });
+
+  var restored=loadState();
+  syncSegs();
+  applyLang();
+  setSaveMsg(!storeOK?'nostore':(restored?'restored':'autosave'), restored);
+  renderAll();
+  // Phones open on the results — the defaults already model a real purchase,
+  // and the menu reaches the inputs in one tap.
+  setInputsOpen(true);
+  setView('v-summary',false);
+})();
+</script>
